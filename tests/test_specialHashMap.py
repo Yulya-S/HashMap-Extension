@@ -26,11 +26,13 @@ class TestSpecialHashMap:
          ("<4", "{'3': 30}"),
          (">=3", "{'3': 30}"),
          ("<=3", "{'3': 30}"),
-         ("<>2", "{'3': 30}")]
+         ("<>2", "{'3': 30}"),
+         (">3; >5", "{'(4, 8)': 30}")]
     )
     def test_ploc(self,specialHashMap, text, response):
         specialHashMap["3"] = 30
         specialHashMap["value3"] = 30
+        specialHashMap["(4, 8)"] = 30
         assert specialHashMap.ploc[text].__str__() == response
 
     def test_invalid_conditions(self, specialHashMap):
@@ -57,7 +59,3 @@ class TestSpecialHashMap:
         specialHashMap["3"] = 30
         with pytest.raises(ValueError):
             specialHashMap.ploc[""]
-
-
-
-

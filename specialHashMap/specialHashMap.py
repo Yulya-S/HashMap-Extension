@@ -1,3 +1,6 @@
+import string
+
+
 class SpecialHashMap(dict):
     def __init__(self):
         self.iloc = iloc(self)
@@ -26,39 +29,46 @@ class ploc:
             raise ValueError("item is not str")
         if item == "":
             raise ValueError("Invalid key")
-        item = item.split(',')
+
+        last_type = None
+        operation = ''
+        number = ''
         for i in item:
-            operation = ''
-            number = ''
-            for l in i:
-                if l in ['>', '=', '<']:
-                    operation += l
-                elif l.isdigit() or l == '.':
-                    number += l
-                elif l != ' ':
-                    raise ValueError("Invalid key")
-            if operation != '' and number != '':
+            if i in ['>', '=', '<'] and (last_type in ["op", None]):
+                last_type = "op"
+                operation += i
+            elif (i.isdigit() or i == '.') and last_type in ["num", "op"]:
+                last_type = "num"
+                number += i
+            elif (i in string.punctuation and i != "(") and last_type == "num":
                 result.append([operation, number])
-            else:
+                operation = ''
+                number = ''
+                last_type = None
+            elif i not in [" ", "("] or last_type != None:
                 raise ValueError("Invalid key")
+
+        if operation != '' and number != '':
+            result.append([operation, number])
+        elif (operation == '' and number != '') or (operation != '' and number == ''):
+            raise ValueError("Invalid key")
+
         return result
 
     def parse_keys(self):
         keys = []
         for i in self.d.keys():
-            text = i.split(',')
-            key = []
-            for l in text:
-                key.append('')
-                for z in l:
-                    if z.isdigit() or z == '.':
-                       key[-1] += z
-                    elif z not in ['(', ')', ' ']:
-                        key = i
-                        break
-                if type(key) == str:
+            key = [""]
+            for l in i:
+                if l.isdigit() or l == '.':
+                    key[-1] += l
+                elif l in string.punctuation and l not in ["(", ")"] and key[-1] != '':
+                    key.append("")
+                elif l not in ['(', ')', ' ']:
+                    key = i
                     break
             keys.append(key)
+
         for i in range(len(keys)):
             if type(keys[i]) != str:
                 for l in range(len(keys[i])):
